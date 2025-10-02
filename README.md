@@ -1,3 +1,8 @@
+### Requisitos
+* Java 21
+* Gradle
+* Docker
+
 # Proyecto Base Implementando Clean Architecture
 
 ## Antes de Iniciar

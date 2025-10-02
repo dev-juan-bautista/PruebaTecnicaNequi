@@ -8,22 +8,22 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class Handler {
-//private  final UseCase useCase;
-//private  final UseCase2 useCase2;
+public class ProductHandler {
 
-    public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
+    public Mono<ServerResponse> createProduct(ServerRequest serverRequest) {
         return ServerResponse.ok().bodyValue("");
     }
 
-    public Mono<ServerResponse> listenGETOtherUseCase(ServerRequest serverRequest) {
-        // useCase2.logic();
+    public Mono<ServerResponse> deleteProduct(ServerRequest serverRequest) {
         return ServerResponse.ok().bodyValue("");
     }
 
-    public Mono<ServerResponse> listenPOSTUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
+    public Mono<ServerResponse> updateStockProduct(ServerRequest serverRequest) {
         return ServerResponse.ok().bodyValue("");
     }
+
+    public Mono<ServerResponse> getMaxStockProduct(ServerRequest serverRequest) {
+        return ServerResponse.ok().bodyValue("");
+    }
+
 }

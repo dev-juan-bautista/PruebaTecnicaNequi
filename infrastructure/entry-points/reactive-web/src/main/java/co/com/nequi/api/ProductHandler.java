@@ -73,18 +73,15 @@ public class ProductHandler {
 
     //AJUSTAR
     public Mono<ServerResponse> getMaxStockProduct(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(ProductDto.class)
-                .doOnNext(validatorEngine::validate)
-                .map(mapper::toModel)
-                .flatMap(model ->
-                        useCase.getMaxStockProduct(model)
-                                .map(mapper::toDto)
-                                .flatMap(dto ->
-                                        ServerResponse.accepted()
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .bodyValue(ResponseBuilder.buildSuccessResponse(dto, "Se ha realizado la consulta con exito"))
-                                )
+        return useCase.getMaxStockProduct()
+                .map(mapper::toDto)
+                .collectList()
+                .flatMap(dto ->
+                        ServerResponse.accepted()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(ResponseBuilder.buildSuccessResponse(dto, "Se ha realizado la consulta con exito"))
                 )
+
                 .onErrorResume(HandleException::handleException);
     }
 

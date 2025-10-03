@@ -66,8 +66,6 @@ public class RouterRest {
                                         .and(contentType(MediaType.APPLICATION_JSON)),
                                 handler::updateStockProduct)
                         .GET("/max-stock",
-                                accept(MediaType.APPLICATION_JSON)
-                                        .and(contentType(MediaType.APPLICATION_JSON)),
                                 handler::getMaxStockProduct)
                 )
                 .build();

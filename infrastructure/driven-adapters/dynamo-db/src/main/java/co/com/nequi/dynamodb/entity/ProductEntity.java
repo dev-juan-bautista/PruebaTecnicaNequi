@@ -7,6 +7,8 @@ import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
 @Setter
 @Builder
@@ -36,11 +38,13 @@ public class ProductEntity {
     }
 
     @DynamoDbAttribute("stock")
+    @DynamoDbSecondarySortKey(indexNames = "idSucursal-stock-index")
     public Integer getStock() {
         return stock;
     }
 
     @DynamoDbAttribute("idSucursal")
+    @DynamoDbSecondaryPartitionKey(indexNames = "idSucursal-stock-index")
     public String getBranchId() {
         return branchId;
     }

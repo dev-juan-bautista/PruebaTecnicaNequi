@@ -26,18 +26,24 @@ public class FranchiseUseCase {
     public Mono<Franchise> updateFranchise(Franchise franchise) {
         return franchisePort.findById(franchise.getId())
                 .switchIfEmpty(Mono.error(new BusinessException("Franquicia no encontrada con ID: " + franchise.getId())))
-                .flatMap(existing ->
-                        !existing.getName().equals(franchise.getName())
-                                ? franchisePort.existByName(franchise.getName())
-                                .flatMap(exists -> {
-                                    if (exists) {
-                                        return Mono.error(new BusinessException(
-                                                "Ya existe una franquicia con el nombre: " + franchise.getName()
-                                        ));
-                                    }
-                                    return franchisePort.saveFranchise(franchise);
-                                })
-                                : Mono.just(franchise)
+                .flatMap(existing -> {
+                            if (franchise.getName() == null || franchise.getName().trim().isEmpty()) {
+                                return Mono.just(existing);
+                            }
+                            if (existing.getName().equals(franchise.getName())) {
+                                return Mono.just(existing);
+                            }
+                            return franchisePort.existByName(franchise.getName())
+                                    .flatMap(exists -> {
+                                        if (exists) {
+                                            return Mono.error(new BusinessException(
+                                                    "Ya existe una franquicia con el nombre: " + franchise.getName()
+                                            ));
+                                        }
+                                        existing.setName(franchise.getName());
+                                        return franchisePort.saveFranchise(existing);
+                                    });
+                        }
                 );
     }
 

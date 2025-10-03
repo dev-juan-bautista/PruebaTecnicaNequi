@@ -5,6 +5,7 @@ import co.com.nequi.model.error.BusinessException;
 import co.com.nequi.model.gateway.BranchPort;
 import co.com.nequi.model.gateway.ProductPort;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -78,8 +79,8 @@ public class ProductUseCase {
         return Mono.just(existingProduct);
     }
 
-    public Mono<Product> getMaxStockProduct(Product product) {
-        return Mono.just(product);
+    public Flux<Product> getMaxStockProduct() {
+        return productPort.findByMoreSockInBranches();
     }
 
 }

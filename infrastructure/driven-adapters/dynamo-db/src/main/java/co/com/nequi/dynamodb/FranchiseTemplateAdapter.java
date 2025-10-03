@@ -55,7 +55,6 @@ public class FranchiseTemplateAdapter extends TemplateAdapterOperations<Franchis
                         .expression("nombre = :nombre")
                         .putExpressionValue(":nombre", AttributeValue.builder().s(name).build())
                         .build())
-                .limit(1)
                 .build();
         return Mono.from(franchiseEntityTable.scan(scanRequest))
                 .map(page -> !page.items().isEmpty())

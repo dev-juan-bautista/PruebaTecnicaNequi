@@ -8,15 +8,22 @@ import co.com.nequi.model.gateway.ProductPort;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -56,7 +63,6 @@ public class ProductTemplateAdapter extends TemplateAdapterOperations<ProductEnt
                         .putExpressionValue(":nombre", AttributeValue.builder().s(name).build())
                         .putExpressionValue(":idSucursal", AttributeValue.builder().s(branchId).build())
                         .build())
-                .limit(1)
                 .build();
         return Mono.from(productEntityTable.scan(scanRequest))
                 .map(page -> !page.items().isEmpty())
@@ -78,6 +84,31 @@ public class ProductTemplateAdapter extends TemplateAdapterOperations<ProductEnt
                 })
                 .flatMap(this::delete)
                 .then();
+    }
+
+    @Override
+    public Flux<Product> findByMoreSockInBranches() {
+        return Flux.from(productEntityTable.scan())
+                .flatMapIterable(Page::items)
+                .collectList()
+                .flatMapMany(allProducts -> {
+                    if (allProducts.isEmpty()) {
+                        return Flux.empty();
+                    }
+                    Map<String, Optional<ProductEntity>> maxStockByBranch = allProducts.stream()
+                            .filter(product -> product.getBranchId() != null && product.getStock() != null)
+                            .collect(Collectors.groupingBy(
+                                    ProductEntity::getBranchId,
+                                    Collectors.maxBy(Comparator.comparing(ProductEntity::getStock))
+                            ));
+                    List<ProductEntity> result = maxStockByBranch.values().stream()
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
+                    return Flux.fromIterable(result)
+                            .map(adapterMapper::toModel);
+                })
+                .doOnError(error -> log.error("Error en consulta global: {}", error.getMessage()));
     }
 
     private String generateProductId() {

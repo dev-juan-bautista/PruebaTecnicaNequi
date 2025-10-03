@@ -1,14 +1,11 @@
 package co.com.nequi.usecase;
 
 import co.com.nequi.model.Branch;
-import co.com.nequi.model.Franchise;
 import co.com.nequi.model.error.BusinessException;
 import co.com.nequi.model.gateway.BranchPort;
 import co.com.nequi.model.gateway.FranchisePort;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 @RequiredArgsConstructor
 public class BranchUseCase {

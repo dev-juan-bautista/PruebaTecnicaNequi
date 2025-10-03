@@ -71,7 +71,6 @@ public class ProductHandler {
                 .onErrorResume(HandleException::handleException);
     }
 
-    //AJUSTAR
     public Mono<ServerResponse> getMaxStockProduct(ServerRequest serverRequest) {
         return useCase.getMaxStockProduct()
                 .map(mapper::toDto)

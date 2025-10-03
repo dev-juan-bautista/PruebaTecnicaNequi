@@ -20,3 +20,5 @@ cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 aws:
   region: us-east-1
+  accessKey: ${ACCESS_KEY}
+  secretKey: ${SECRET_KEY}

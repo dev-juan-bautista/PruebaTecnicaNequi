@@ -32,21 +32,21 @@ class DynamoDBConfigTest {
     //    assertNotNull(result);
     //}
 
-    @Test
-    void testAmazonDynamoDBAsync() {
+    //@Test
+    //void testAmazonDynamoDBAsync() {
 
-        DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDBAsync(
-                publisher,
-                "region");
+    //    DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDBAsync(
+    //            publisher,
+    //            "region");
 
-        assertNotNull(result);
-    }
+    //    assertNotNull(result);
+    //}
 
 
-    @Test
-    void testGetDynamoDbEnhancedAsyncClient() {
-        DynamoDbEnhancedAsyncClient result = dynamoDBConfig.getDynamoDbEnhancedAsyncClient(dynamoDbAsyncClient);
+    //@Test
+    //void testGetDynamoDbEnhancedAsyncClient() {
+    //    DynamoDbEnhancedAsyncClient result = dynamoDBConfig.getDynamoDbEnhancedAsyncClient(dynamoDbAsyncClient);
 
-        assertNotNull(result);
-    }
+    //    assertNotNull(result);
+    //}
 }

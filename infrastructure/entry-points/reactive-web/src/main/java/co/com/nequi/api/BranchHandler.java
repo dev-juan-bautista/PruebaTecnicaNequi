@@ -44,7 +44,7 @@ public class BranchHandler {
 
     public Mono<ServerResponse> updateBranch(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(BranchDto.class)
-                .doOnNext(validatorEngine::validate)
+                .doOnNext(dto -> validatorEngine.validateId(dto.getId()))
                 .map(mapper::toModel)
                 .flatMap(model ->
                         useCase.updateBranch(model)

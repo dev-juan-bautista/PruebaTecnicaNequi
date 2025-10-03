@@ -25,10 +25,9 @@ public class BranchUseCase {
                 )
                 .flatMap(tuple -> {
                     Boolean exists = tuple.getT1();
-                    Franchise franchise = tuple.getT2();
                     if (exists) {
                         return Mono.error(new BusinessException(
-                                "Ya existe una sucursal con el nombre: " + franchise.getName()
+                                "Ya existe una sucursal con el nombre: " + branch.getName()
                         ));
                     }
                     return branchPort.saveBranch(branch);

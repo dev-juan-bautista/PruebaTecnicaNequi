@@ -32,6 +32,6 @@ public class ProductDto {
     @JsonProperty("idSucursal")
     @NotBlank(message = "El campo idSucursal es obligatorio")
     @Valid
-    private String idBranch;
+    private String branchId;
 
 }

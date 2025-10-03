@@ -42,7 +42,7 @@ public class FranchiseHandler {
 
     public Mono<ServerResponse> updateFranchise(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(FranchiseDto.class)
-                .doOnNext(validatorEngine::validate)
+                .doOnNext(dto -> validatorEngine.validateId(dto.getId()))
                 .map(mapper::toModel)
                 .flatMap(model ->
                         useCase.updateFranchise(model)

@@ -39,10 +39,9 @@ public class ProductHandler {
                 .onErrorResume(HandleException::handleException);
     }
 
-    //AJUSTAR
     public Mono<ServerResponse> deleteProduct(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ProductDto.class)
-                .doOnNext(validatorEngine::validate)
+                .doOnNext(dto -> validatorEngine.validateId(dto.getId()))
                 .map(mapper::toModel)
                 .flatMap(model ->
                         useCase.deleteProduct(model)
@@ -58,7 +57,7 @@ public class ProductHandler {
 
     public Mono<ServerResponse> updateStockProduct(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ProductDto.class)
-                .doOnNext(validatorEngine::validate)
+                .doOnNext(dto -> validatorEngine.validateId(dto.getId()))
                 .map(mapper::toModel)
                 .flatMap(model ->
                         useCase.updateProduct(model)

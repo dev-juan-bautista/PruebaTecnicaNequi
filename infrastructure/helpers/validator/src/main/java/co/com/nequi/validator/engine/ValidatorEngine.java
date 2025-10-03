@@ -53,4 +53,11 @@ public class ValidatorEngine {
         return fieldName; // fallback al nombre del campo Java
     }
 
+    public void validateId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new ValidationException("El ID es obligatorio",
+                    List.of(Map.of("campo", "id", "mensaje", "El campo id es obligatorio")));
+        }
+    }
+
 }

@@ -21,7 +21,7 @@ public class ProductEntity {
 
     private Integer stock;
 
-    private String idBranch;
+    private String branchId;
 
 
     @DynamoDbPartitionKey
@@ -41,7 +41,7 @@ public class ProductEntity {
     }
 
     @DynamoDbAttribute("idSucursal")
-    public String getIdBranch() {
-        return idBranch;
+    public String getBranchId() {
+        return branchId;
     }
 }

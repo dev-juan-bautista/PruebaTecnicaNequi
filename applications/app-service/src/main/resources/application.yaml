@@ -2,15 +2,11 @@ server:
   port: 8080
 spring:
   application:
-    name: "PruebaTecnicaNequi"
+    name: PruebaTecnicaNequi
   devtools:
     add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
   profiles:
-    include: null
+    active: dev
 management:
   endpoints:
     web:
@@ -23,5 +19,4 @@ management:
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 aws:
-  dynamodb:
-    endpoint: "http://localhost:8000"
+  region: us-east-1

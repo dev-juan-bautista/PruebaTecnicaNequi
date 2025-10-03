@@ -1,5 +1,6 @@
 package co.com.nequi.validator.utils;
 
+import co.com.nequi.model.error.BusinessException;
 import co.com.nequi.validator.dto.response.ApiGenericResponse;
 import co.com.nequi.validator.error.ValidationException;
 
@@ -28,15 +29,15 @@ public class ResponseBuilder {
                 .build();
     }
 
-    //public static ApiGenericResponse<Object> buildBusinessErrorResponse(BusinessException ex) {
-    //    return ApiGenericResponse.builder()
-    //            .success(false)
-    //            .errors(null)
-    //            .responseCode(ex.getErrorCode())
-    //            .message(ex.getMessage())
-    //            .timestamp(LocalDateTime.now())
-    //            .build();
-    //}
+    public static ApiGenericResponse<Object> buildBusinessErrorResponse(BusinessException ex) {
+        return ApiGenericResponse.builder()
+                .success(false)
+                .errors(null)
+                .responseCode("NEQUI_SERVICE_BUSINESS_ERROR")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
     public static ApiGenericResponse<Object> buildGenericErrorResponse(Throwable ex) {
         return ApiGenericResponse.builder()

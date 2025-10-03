@@ -42,6 +42,8 @@ subprojects {
         testCompileOnly  "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor  "org.projectlombok:lombok:${lombokVersion}"
         implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+        annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
     }
 
     tasks.withType(Test).configureEach {

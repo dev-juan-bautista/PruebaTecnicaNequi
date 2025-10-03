@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ProductUseCase {
 
-    private final ProductPort productPort;
+    //private final ProductPort productPort;
 
     public Mono<Product> saveProduct(Product product) {
         return Mono.just(product);

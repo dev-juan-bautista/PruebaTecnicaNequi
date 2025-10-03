@@ -24,6 +24,8 @@ public class BranchDto {
     private String name;
 
     @JsonProperty("idFranquicia")
+    @NotBlank(message = "El campo idFranquicia es obligatorio")
+    @Valid
     private String franchiseId;
 
 }

@@ -7,4 +7,8 @@ public interface FranchisePort {
 
     Mono<Franchise> saveFranchise(Franchise franchise);
 
+    Mono<Boolean> existByName(String name);
+
+    Mono<Franchise> findById(String id);
+
 }

@@ -9,7 +9,8 @@ Clean Architecture) para garantizar mantenibilidad, testabilidad y separación d
 
 El sistema soporta operaciones CRUD sobre franquicias, sucursales y productos, incluyendo la consulta de productos con
 mayor stock.
-La persistencia se implementa con AWS DynamoDB, y la aplicación está lista para ser desplegada en contenedores Docker.
+La persistencia se implementa con AWS DynamoDB, y la aplicación está lista para ser desplegada en contenedores Docker y
+tambien bajo AWS CloudFormation.
 
 ## ⚙️ Tecnologías utilizadas
 
@@ -21,6 +22,8 @@ La persistencia se implementa con AWS DynamoDB, y la aplicación está lista par
 * Docker
 * Logback / SLF4J para logging estructurado en JSON
 * JUnit 5 / Mockito para pruebas unitarias
+
+---
 
 ## 🏗️ Arquitectura
 
@@ -75,6 +78,8 @@ encontraremos la función “public static void main(String[] args)”.
 
 **Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
 
+---
+
 ## 🚀 Endpoints principales
 
 ### Franquicias
@@ -104,6 +109,8 @@ encontraremos la función “public static void main(String[] args)”.
 En el siguiente directorio del proyecto puede obtener la coleccion postman para poder probar los endpoints mencionados con anterioridad:
 * `Postman -> PruebaNequi.postman_collection.json`.
 
+--- 
+
 ## Docker
 
 Para realiazr el empaquetamiento de la aplicacion y poder correrla en local a traves de docker debe ejecutar los siguientes comandos
@@ -126,6 +133,32 @@ docker build -t prueba-tecnica-nequi:1.0 -f deployment/Dockerfile .
 
 docker run --rm -p 8080:8080 -e AWS_REGION=us-east-1 -e AWS_ACCESS_KEY=XXXXXXXXXX -e AWS_SECRET_KEY=XXXXXXXXXX --name prueba-nequi prueba-tecnica-nequi:1.0
 ```
+
+---
+
+## ☁️ Despliegue en AWS CloudFormation
+
+Además del despliegue en contenedores Docker, el proyecto también fue **desplegado en AWS CloudFormation** utilizando la plantilla **`TemplateNequi.yaml`**, la cual se encuentra ubicada en la carpeta `deployment -> TemplateNequi.yaml`
+
+En la plantilla desarrollada defino una **pila completa** que automatiza la infraestructura necesaria para ejecutar el backend de la prueba técnica en la nube, incluyendo:
+- **VPC:** Configuración de red donde se despliega el servicio.
+- **Internet Gateway y Route Table:** Permiten la comunicación pública hacia Internet.
+- **Security Group:** Habilita el acceso externo al puerto `8080` para el servicio.
+- **Rol IAM (ECSExecutionRole-PruebaNequi):** Con permisos sobre **DynamoDB** y **CloudWatch Logs**.
+- **ECS Cluster (Fargate):** Donde se ejecuta el contenedor de la aplicación sin necesidad de gestionar servidores.
+- **Task Definition:** Define los recursos del contenedor (`512 vCPU`, `1024 MB RAM`), la imagen Docker de la aplicación alojada en **Amazon ECR**, y las variables de entorno requeridas (`AWS_REGION`, `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`).
+- **CloudWatch Log Group:** Centraliza los logs generados por la aplicación para su monitoreo.
+
+Una vez creada la pila desde CloudFormation, se genera automáticamente el servicio ECS que ejecuta la aplicación en contenedores Fargate dentro de la red configurada.
+
+### 🔗 Acceso a la aplicación desplegada
+
+Tras el despliegue, la aplicación queda accesible públicamente desde la IP configurada en la plantilla.  
+Para efectos de prueba, el backend puede consultarse directamente reemplazando el host local por la siguiente dirección:
+
+### `44.201.38.215:8080`
+
+---
 
 ## 📌 Consideraciones de diseño
 

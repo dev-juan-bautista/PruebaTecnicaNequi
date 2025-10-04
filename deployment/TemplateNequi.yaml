@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+ Desarrollo para la prueba tecnica de Nequi
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: prueba-nequi-vpc
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: prueba-nequi-public-subnet
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: prueba-nequi-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: prueba-nequi-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: recibe entradas
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: prueba-nequi-sg
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ECSExecutionRole-PruebaNequi
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/prueba-nequi
+      RetentionInDays: 14
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: prueba-nequi-cluster
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: prueba-nequi-task
+      Cpu: "512"
+      Memory: "1024"
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: prueba-nequi
+          Image: 912471613149.dkr.ecr.us-east-1.amazonaws.com/prueba/nequi:latest
+          PortMappings:
+            - ContainerPort: 8080
+          Environment:
+            - Name: AWS_REGION
+              Value: us-east-1
+            - Name: AWS_ACCESS_KEY
+              Value: AKIA5I44L33OXARQPTEQ
+            - Name: AWS_SECRET_KEY
+              Value: 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
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: prueba-nequi-service
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref TaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PublicSubnet
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+
+Outputs:
+  VPCId:
+    Description: ID de la VPC creada
+    Value: !Ref VPC
+
+  PublicSubnetId:
+    Description: ID de la Subnet pública creada
+    Value: !Ref PublicSubnet
+
+  ECSClusterName:
+    Description: Nombre del cluster ECS
+    Value: !Ref ECSCluster
+
+  ECSServiceName:
+    Description: Nombre del servicio ECS
+    Value: !Ref ECSService
+
+  CloudWatchLogs:
+    Description: Log Group en CloudWatch
+    Value: !Ref LogGroup
+
+  SecurityGroupId:
+    Description: ID del Security Group
+    Value: !Ref ServiceSecurityGroup

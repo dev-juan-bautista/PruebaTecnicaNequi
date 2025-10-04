@@ -5,7 +5,6 @@ import co.com.nequi.dynamodb.helper.TemplateAdapterOperations;
 import co.com.nequi.dynamodb.mapper.BranchAdapterMapper;
 import co.com.nequi.model.Branch;
 import co.com.nequi.model.gateway.BranchPort;
-import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -19,7 +18,6 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.UUID;
 
 @Repository
-@Slf4j
 public class BranchTemplateAdapter extends TemplateAdapterOperations<BranchEntity, String, BranchEntity> implements BranchPort {
 
     private final DynamoDbAsyncTable<BranchEntity> branchEntityTable;
@@ -42,10 +40,7 @@ public class BranchTemplateAdapter extends TemplateAdapterOperations<BranchEntit
                 })
                 .map(adapterMapper::toEntity)
                 .flatMap(this::save)
-                .map(adapterMapper::toModel)
-                .doOnSuccess(saved -> log.info("Sucursal guardada - ID: {}, Nombre: {}",
-                        saved.getId(), saved.getName()))
-                .doOnError(error -> log.error("Error guardando sucursal: {}", error.getMessage()));
+                .map(adapterMapper::toModel);
     }
 
     @Override

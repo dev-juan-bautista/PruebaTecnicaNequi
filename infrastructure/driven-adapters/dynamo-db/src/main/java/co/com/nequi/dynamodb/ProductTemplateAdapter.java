@@ -5,7 +5,6 @@ import co.com.nequi.dynamodb.helper.TemplateAdapterOperations;
 import co.com.nequi.dynamodb.mapper.ProductAdapterMapper;
 import co.com.nequi.model.Product;
 import co.com.nequi.model.gateway.ProductPort;
-import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -26,7 +25,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
-@Slf4j
 public class ProductTemplateAdapter extends TemplateAdapterOperations<ProductEntity, String, ProductEntity> implements ProductPort {
 
     private final DynamoDbAsyncTable<ProductEntity> productEntityTable;
@@ -49,10 +47,7 @@ public class ProductTemplateAdapter extends TemplateAdapterOperations<ProductEnt
                 })
                 .map(adapterMapper::toEntity)
                 .flatMap(this::save)
-                .map(adapterMapper::toModel)
-                .doOnSuccess(saved -> log.info("Producto guardada - ID: {}, Nombre: {}",
-                        saved.getId(), saved.getName()))
-                .doOnError(error -> log.error("Error guardando producto: {}", error.getMessage()));
+                .map(adapterMapper::toModel);
     }
 
     @Override
@@ -107,8 +102,7 @@ public class ProductTemplateAdapter extends TemplateAdapterOperations<ProductEnt
                             .collect(Collectors.toList());
                     return Flux.fromIterable(result)
                             .map(adapterMapper::toModel);
-                })
-                .doOnError(error -> log.error("Error en consulta global: {}", error.getMessage()));
+                });
     }
 
     private String generateProductId() {

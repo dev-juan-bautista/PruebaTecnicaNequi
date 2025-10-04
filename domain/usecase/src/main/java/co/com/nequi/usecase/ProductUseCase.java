@@ -1,6 +1,7 @@
 package co.com.nequi.usecase;
 
 import co.com.nequi.model.Product;
+import co.com.nequi.model.constants.BusinessMessages;
 import co.com.nequi.model.error.BusinessException;
 import co.com.nequi.model.gateway.BranchPort;
 import co.com.nequi.model.gateway.ProductPort;
@@ -21,13 +22,15 @@ public class ProductUseCase {
         return Mono.zip(
                         productPort.existByNameAndBranchId(product.getName(), product.getBranchId()),
                         branchPort.findById(product.getBranchId())
-                                .switchIfEmpty(Mono.error(new BusinessException("Sucursal no encontrada con ID: " + product.getBranchId())))
+                                .switchIfEmpty(Mono.error(new BusinessException(
+                                        String.format(BusinessMessages.BRANCH_NOT_FOUND.getMessage(), product.getBranchId())
+                                )))
                 )
                 .flatMap(tuple -> {
                     Boolean exists = tuple.getT1();
                     if (exists) {
                         return Mono.error(new BusinessException(
-                                "Ya existe un producto con el nombre: " + product.getName() + " para la sucursal: " + product.getBranchId()
+                                String.format(BusinessMessages.PRODUCT_BRANCH_NAME_ALREADY_EXISTS.getMessage(), product.getName(), product.getBranchId())
                         ));
                     }
                     return productPort.saveProduct(product);
@@ -36,7 +39,9 @@ public class ProductUseCase {
 
     public Mono<Product> deleteProduct(Product product) {
         return productPort.findById(product.getId())
-                .switchIfEmpty(Mono.error(new BusinessException("Producto no encontrado con ID: " + product.getId())))
+                .switchIfEmpty(Mono.error(new BusinessException(
+                        String.format(BusinessMessages.DATA_NOT_FOUND.getMessage(), product.getId())
+                )))
                 .flatMap(exists -> productPort.deleteById(product.getId())
                         .then(Mono.just(exists))
                 );
@@ -44,7 +49,9 @@ public class ProductUseCase {
 
     public Mono<Product> updateProduct(Product product) {
         return productPort.findById(product.getId())
-                .switchIfEmpty(Mono.error(new BusinessException("Producto no encontrado con ID: " + product.getId())))
+                .switchIfEmpty(Mono.error(new BusinessException(
+                        String.format(BusinessMessages.DATA_NOT_FOUND.getMessage(), product.getId())
+                )))
                 .flatMap(existing -> validateNameChange(product, existing))
                 .flatMap(validatedExisting -> updateFields(product, validatedExisting))
                 .flatMap(productPort::saveProduct);
@@ -61,7 +68,7 @@ public class ProductUseCase {
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new BusinessException(
-                                "Ya existe un producto con el nombre: " + updatedProduct.getName()
+                                String.format(BusinessMessages.NAME_ALREADY_EXISTS.getMessage(), updatedProduct.getName())
                         ));
                     }
                     return Mono.just(existingProduct);

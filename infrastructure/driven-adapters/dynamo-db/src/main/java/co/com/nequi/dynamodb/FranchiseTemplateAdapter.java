@@ -5,7 +5,6 @@ import co.com.nequi.dynamodb.helper.TemplateAdapterOperations;
 import co.com.nequi.dynamodb.mapper.FranchiseAdapterMapper;
 import co.com.nequi.model.Franchise;
 import co.com.nequi.model.gateway.FranchisePort;
-import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -19,7 +18,6 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.UUID;
 
 @Repository
-@Slf4j
 public class FranchiseTemplateAdapter extends TemplateAdapterOperations<FranchiseEntity, String, FranchiseEntity> implements FranchisePort {
 
     private final DynamoDbAsyncTable<FranchiseEntity> franchiseEntityTable;
@@ -42,10 +40,7 @@ public class FranchiseTemplateAdapter extends TemplateAdapterOperations<Franchis
                 })
                 .map(adapterMapper::toEntity)
                 .flatMap(this::save)
-                .map(adapterMapper::toModel)
-                .doOnSuccess(saved -> log.info("Franquicia guardada - ID: {}, Nombre: {}",
-                        saved.getId(), saved.getName()))
-                .doOnError(error -> log.error("Error guardando franquicia: {}", error.getMessage()));
+                .map(adapterMapper::toModel);
     }
 
     @Override

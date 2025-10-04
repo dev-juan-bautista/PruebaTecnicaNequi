@@ -1,6 +1,7 @@
 package co.com.nequi.usecase;
 
 import co.com.nequi.model.Franchise;
+import co.com.nequi.model.constants.BusinessMessages;
 import co.com.nequi.model.error.BusinessException;
 import co.com.nequi.model.gateway.FranchisePort;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class FranchiseUseCase {
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new BusinessException(
-                                "Ya existe una franquicia con el nombre: " + franchise.getName()
+                                String.format(BusinessMessages.NAME_ALREADY_EXISTS.getMessage(), franchise.getName())
                         ));
                     }
                     return franchisePort.saveFranchise(franchise);
@@ -25,7 +26,9 @@ public class FranchiseUseCase {
 
     public Mono<Franchise> updateFranchise(Franchise franchise) {
         return franchisePort.findById(franchise.getId())
-                .switchIfEmpty(Mono.error(new BusinessException("Franquicia no encontrada con ID: " + franchise.getId())))
+                .switchIfEmpty(Mono.error(new BusinessException(
+                        String.format(BusinessMessages.DATA_NOT_FOUND.getMessage(), franchise.getId())
+                )))
                 .flatMap(existing -> {
                             if (franchise.getName() == null || franchise.getName().trim().isEmpty()) {
                                 return Mono.just(existing);
@@ -37,7 +40,7 @@ public class FranchiseUseCase {
                                     .flatMap(exists -> {
                                         if (exists) {
                                             return Mono.error(new BusinessException(
-                                                    "Ya existe una franquicia con el nombre: " + franchise.getName()
+                                                    String.format(BusinessMessages.NAME_ALREADY_EXISTS.getMessage(), franchise.getName())
                                             ));
                                         }
                                         existing.setName(franchise.getName());

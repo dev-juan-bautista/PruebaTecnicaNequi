@@ -1,0 +1,61 @@
+<configuration>
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+
+                <!-- timestamp -->
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <!-- nivel de log -->
+                <pattern>
+                    <pattern>
+                        {"type":"%level"}
+                    </pattern>
+                </pattern>
+
+                <pattern>
+                    <pattern>
+                        {"httpMethod":"%X{httpMethod}"}
+                    </pattern>
+                </pattern>
+
+                <pattern>
+                    <pattern>
+                        {"endpoint":"%X{endpoint}"}
+                    </pattern>
+                </pattern>
+                <pattern>
+                    <pattern>
+                        {"traceId":"%X{traceId}"}
+                    </pattern>
+                </pattern>
+
+                <!-- paquete -->
+                <pattern>
+                    <pattern>
+                        {"package":"%logger"}
+                    </pattern>
+                </pattern>
+
+                <!-- clase -->
+                <pattern>
+                    <pattern>
+                        {"class":"%class{0}"}
+                    </pattern>
+                </pattern>
+
+                <!-- mensaje -->
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE"/>
+    </root>
+</configuration>
